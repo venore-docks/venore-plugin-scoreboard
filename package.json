@@ -1,6 +1,6 @@
 {
   "name": "@venore/plugin-scoreboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Telas de indicadores (metas, funil de matrícula e métricas livres) por setor, consumíveis via web e via Broadcast Studio.",
   "private": true,
   "type": "module",
