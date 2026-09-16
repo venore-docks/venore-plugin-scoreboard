@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { isPluginActive } from "@venore/plugin-sdk";
 import { findBoardIdBySlug, getBoardView } from "../../index";
-import { BoardCanvas } from "../../components/board-view/board-canvas";
+import { TvCanvas } from "../../components/board-view/tv-canvas";
 
 export const dynamic = "force-dynamic";
 
@@ -38,17 +38,5 @@ export default async function ScoreboardTvPage({ params }: { params: Promise<{ s
     return <TvMessage>{result.error.message}</TvMessage>;
   }
 
-  const { board } = result.data;
-
-  return (
-    <div className="min-h-screen bg-background p-6 sm:p-10">
-      <div className="mx-auto max-w-6xl space-y-8">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{board.name}</h1>
-          <p className="text-sm text-muted-foreground sm:text-base">{board.sector}</p>
-        </div>
-        <BoardCanvas boardId={boardId} initialView={result.data} />
-      </div>
-    </div>
-  );
+  return <TvCanvas boardId={boardId} initialView={result.data} />;
 }

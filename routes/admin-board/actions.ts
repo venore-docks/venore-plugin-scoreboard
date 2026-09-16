@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  addWidgetItem,
   createWidget,
   deleteWidget,
+  removeWidgetItem,
   setBoardEditors,
   setWidgetManualValue,
   updateBoard,
@@ -87,10 +89,11 @@ export async function deleteWidgetAction(
   return { error: null };
 }
 
-// Edição de ESTRUTURA (adicionar/remover grupo, etapa ou item) via JSON — os números do dia a dia
-// são editados pelos inputs de setWidgetManualValueAction abaixo; a estrutura muda raramente
-// (uma vez, ao montar o board), então um textarea JSON aqui é proporcional ao uso.
-export async function updateWidgetStructureAction(
+// Edição de ESTRUTURA (adicionar/remover grupo, etapa ou item) — formulário dedicado por kind
+// (goal-progress-editor.tsx / funnel-editor.tsx / metric-free-editor.tsx), nunca JSON cru: o
+// requisito era um "método clean" pra quem lança os números não precisar tocar em JSON. A key é
+// derivada do rótulo em features/add-widget-item/service.ts.
+export async function addWidgetItemAction(
   _prevState: ScoreboardActionState,
   formData: FormData,
 ): Promise<ScoreboardActionState> {
@@ -98,16 +101,30 @@ export async function updateWidgetStructureAction(
 
   const boardId = String(formData.get("boardId") ?? "");
   const widgetId = String(formData.get("widgetId") ?? "");
-  const rawConfig = String(formData.get("config") ?? "");
+  const kind = String(formData.get("kind") ?? "") as "goal_progress" | "funnel" | "metric_free";
+  const label = String(formData.get("label") ?? "");
 
-  let config: Record<string, unknown>;
-  try {
-    config = JSON.parse(rawConfig);
-  } catch {
-    return { error: "JSON inválido — confira a formatação." };
-  }
+  const result = await addWidgetItem(
+    kind === "metric_free" ? { widgetId, kind, label, unit: String(formData.get("unit") ?? "") || undefined } : { widgetId, kind, label },
+  );
 
-  const result = await updateWidget({ widgetId, config });
+  if (!result.success) return { error: result.error.message };
+  revalidatePath(boardPath(boardId));
+  return { error: null };
+}
+
+export async function removeWidgetItemAction(
+  _prevState: ScoreboardActionState,
+  formData: FormData,
+): Promise<ScoreboardActionState> {
+  if (!(await isPluginActive("scoreboard"))) return { error: PLUGIN_DISABLED_ERROR };
+
+  const boardId = String(formData.get("boardId") ?? "");
+  const widgetId = String(formData.get("widgetId") ?? "");
+  const kind = String(formData.get("kind") ?? "") as "goal_progress" | "funnel" | "metric_free";
+  const key = String(formData.get("key") ?? "");
+
+  const result = await removeWidgetItem({ widgetId, kind, key });
   if (!result.success) return { error: result.error.message };
   revalidatePath(boardPath(boardId));
   return { error: null };

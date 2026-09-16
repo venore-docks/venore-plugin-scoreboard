@@ -4,7 +4,6 @@ import type { FunnelWidgetConfig, GoalProgressWidgetConfig, MetricFreeWidgetConf
 import { GoalProgressEditor } from "./goal-progress-editor";
 import { FunnelEditor } from "./funnel-editor";
 import { MetricFreeEditor } from "./metric-free-editor";
-import { StructureEditor } from "./structure-editor";
 import { DeleteWidgetButton } from "./delete-widget-button";
 
 const KIND_LABELS: Record<WidgetRecord["kind"], string> = {
@@ -46,12 +45,6 @@ export function WidgetCard({ boardId, widget }: { boardId: string; widget: Widge
           <MetricFreeEditor boardId={boardId} widgetId={widget.id} config={widget.config as MetricFreeWidgetConfig} readOnly={readOnly} />
         )}
       </div>
-
-      {!readOnly && (
-        <div className="px-4 pb-4">
-          <StructureEditor boardId={boardId} widgetId={widget.id} config={widget.config} />
-        </div>
-      )}
     </div>
   );
 }

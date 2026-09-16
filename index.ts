@@ -15,6 +15,8 @@ export { reorderWidgetsHandler as reorderWidgets } from "./features/reorder-widg
 export {
   setWidgetManualValueHandler as setWidgetManualValue,
 } from "./features/set-widget-manual-value/handler";
+export { addWidgetItemHandler as addWidgetItem } from "./features/add-widget-item/handler";
+export { removeWidgetItemHandler as removeWidgetItem } from "./features/remove-widget-item/handler";
 
 export {
   listPrimeStatusMappingHandler as listPrimeStatusMapping,
@@ -75,6 +77,8 @@ export type {
   SetWidgetManualValueInput,
   SetWidgetManualValueResult,
 } from "./features/set-widget-manual-value/types";
+export type { AddWidgetItemInput, AddWidgetItemResult } from "./features/add-widget-item/types";
+export type { RemoveWidgetItemInput, RemoveWidgetItemResult } from "./features/remove-widget-item/types";
 
 export type {
   ListPrimeStatusMappingInput,
