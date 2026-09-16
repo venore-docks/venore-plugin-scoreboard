@@ -9,8 +9,8 @@ describe("validateWidgetConfig — goal_progress", () => {
   it("rejeita chave de grupo duplicada", () => {
     const config = {
       groups: [
-        { key: "a", label: "A", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 },
-        { key: "a", label: "A de novo", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 },
+        { key: "a", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 },
+        { key: "a", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 },
       ],
     };
     expect(validateWidgetConfig("goal_progress", config)?.code).toBe("scoreboard.goal_progress.duplicate_group_key");
@@ -18,14 +18,14 @@ describe("validateWidgetConfig — goal_progress", () => {
 
   it("rejeita percentual de retenção acima de 100", () => {
     const config = {
-      groups: [{ key: "a", label: "A", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 150, eligibleBase: 10, reenrolledActual: 0 }],
+      groups: [{ key: "a", newStudentsGoal: 1, newStudentsActual: 0, retentionTargetPercent: 150, eligibleBase: 10, reenrolledActual: 0 }],
     };
     expect(validateWidgetConfig("goal_progress", config)?.code).toBe("scoreboard.goal_progress.invalid_percent");
   });
 
   it("rejeita número negativo em qualquer campo numérico", () => {
     const config = {
-      groups: [{ key: "a", label: "A", newStudentsGoal: -1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 }],
+      groups: [{ key: "a", newStudentsGoal: -1, newStudentsActual: 0, retentionTargetPercent: 90, eligibleBase: 10, reenrolledActual: 0 }],
     };
     expect(validateWidgetConfig("goal_progress", config)?.code).toBe("scoreboard.goal_progress.invalid_number");
   });

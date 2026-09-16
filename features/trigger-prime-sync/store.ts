@@ -1,13 +1,14 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@venore/plugin-sdk";
 import {
+  scoreboardGroups,
   scoreboardPrimeStatusMapping,
   scoreboardPrimeStudentRaw,
   scoreboardPrimeSyncLog,
   scoreboardWidgets,
 } from "../../database/schema";
 import type { PrimeStudentDTO } from "../../shared/prime-client/types";
-import type { PrimeSyncLogRecord, WidgetRecord } from "../../contracts/types";
+import type { GroupRecord, PrimeSyncLogRecord, WidgetRecord } from "../../contracts/types";
 
 export async function insertRunningLog(triggeredByUserId: string): Promise<PrimeSyncLogRecord> {
   const [row] = await db.insert(scoreboardPrimeSyncLog).values({ triggeredByUserId, status: "running" }).returning();
@@ -95,6 +96,15 @@ export async function findMappingsForBoard(boardId: string): Promise<Array<{ raw
     .where(eq(scoreboardPrimeStatusMapping.boardId, boardId))
     .orderBy(asc(scoreboardPrimeStatusMapping.rawStatus));
   return rows;
+}
+
+// primeSegmentKey mora no catálogo compartilhado agora (database/schema/index.ts,
+// scoreboardGroups), não mais espalhado por GoalProgressGroup — resolvido uma vez por rodada de
+// sync pra todas as keys usadas por todos os boards prime_sync (ver service.ts).
+export async function findGroupsByKeys(keys: string[]): Promise<GroupRecord[]> {
+  if (keys.length === 0) return [];
+  const rows = await db.select().from(scoreboardGroups).where(inArray(scoreboardGroups.key, keys));
+  return rows as GroupRecord[];
 }
 
 export async function applyWidgetSyncUpdate(widgetId: string, config: Record<string, unknown>): Promise<void> {

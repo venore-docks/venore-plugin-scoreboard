@@ -7,10 +7,12 @@ export function FunnelPanel({
   title,
   stages,
   countsByGroup,
+  groupLabels,
 }: {
   title: string;
   stages: FunnelStage[];
   countsByGroup: Record<string, Record<string, number>>;
+  groupLabels: Record<string, string>;
 }) {
   const totals = computeFunnelStageTotals({ stages, countsByGroup });
   const groupKeys = Object.keys(countsByGroup).filter((key) => key !== UNGROUPED_KEY);
@@ -35,10 +37,6 @@ export function FunnelPanel({
       </div>
 
       {groupKeys.length > 1 && (
-        // groupKey é exibido cru (não o label do grupo) — o funil só guarda a chave, o label
-        // amigável vive no widget goal_progress do mesmo board (shared/widget-config/types.ts,
-        // GoalProgressGroup.label). Bom o suficiente pro v1: as chaves usadas na prática (slug do
-        // segmento/curso) já são legíveis.
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -54,7 +52,7 @@ export function FunnelPanel({
             <tbody>
               {groupKeys.map((groupKey) => (
                 <tr key={groupKey} className="border-b border-border last:border-b-0">
-                  <td className="py-2 pr-3 font-medium text-foreground">{groupKey}</td>
+                  <td className="py-2 pr-3 font-medium text-foreground">{groupLabels[groupKey] ?? groupKey}</td>
                   {stages.map((stage) => (
                     <td key={stage.key} className="px-2 py-2 text-right tabular-nums text-muted-foreground">
                       {numberFormatter.format(countsByGroup[groupKey]?.[stage.key] ?? 0)}

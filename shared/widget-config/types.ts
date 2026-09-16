@@ -5,13 +5,12 @@
 // sem segmento/curso). Erasto e Fidelis sempre segmentam por groupKey real.
 export const UNGROUPED_KEY = "_all";
 
+// key referencia scoreboardGroups.key (catálogo compartilhado entre boards, database/schema/
+// index.ts) — label e primeSegmentKey NÃO vivem mais aqui, são propriedade do grupo no catálogo,
+// não do widget. Ver features/assign-widget-group (atribui uma key existente do catálogo) e
+// features/get-board-view/service.ts (resolve o label na hora de montar a view).
 export type GoalProgressGroup = {
-  key: string; // slug estável do grupo — segmento (Erasto) ou curso (Fidelis)
-  label: string;
-  // Rótulo cru esperado vindo da Prime pra este grupo (bate com prime_student_raw.rawSegmentOrCourse).
-  // Ausente = usa `key`. Só relevante quando o widget é dataSource=prime_sync — SUPOSIÇÃO, sem
-  // payload real da Prime ainda pra confirmar o formato.
-  primeSegmentKey?: string;
+  key: string;
   newStudentsGoal: number;
   newStudentsActual: number;
   retentionTargetPercent: number; // ex.: 93 — % de retenção alvo

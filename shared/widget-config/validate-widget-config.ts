@@ -41,8 +41,8 @@ function validateGoalProgressConfig(config: Partial<GoalProgressWidgetConfig>): 
 
   const seenKeys = new Set<string>();
   for (const group of config.groups) {
-    if (!isNonEmptyString(group?.key) || !isNonEmptyString(group?.label)) {
-      return { code: "scoreboard.goal_progress.invalid_group", message: "Cada grupo precisa de key e label." };
+    if (!isNonEmptyString(group?.key)) {
+      return { code: "scoreboard.goal_progress.invalid_group", message: "Cada grupo precisa de uma key." };
     }
     if (seenKeys.has(group.key)) {
       return { code: "scoreboard.goal_progress.duplicate_group_key", message: `A chave de grupo "${group.key}" está repetida.` };

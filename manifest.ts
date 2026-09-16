@@ -7,7 +7,7 @@ export const scoreboardManifest: PluginManifest = {
   manifestVersion: "1.0.0",
   key: "scoreboard",
   name: "Telas de Indicadores",
-  version: "1.1.0",
+  version: "1.2.0",
   description:
     "Quadros de metas, funil de matrícula e métricas livres por setor, publicáveis na web e como tela de TV via Broadcast Studio.",
   compatibility: { coreVersion: ">=2.0.0 <3.0.0" },

@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import {
   addWidgetItem,
+  assignWidgetGroup,
   createWidget,
   deleteWidget,
   removeWidgetItem,
   setBoardEditors,
   setWidgetManualValue,
+  unassignWidgetGroup,
   updateBoard,
   updateWidget,
 } from "../../index";
@@ -89,10 +91,10 @@ export async function deleteWidgetAction(
   return { error: null };
 }
 
-// Edição de ESTRUTURA (adicionar/remover grupo, etapa ou item) — formulário dedicado por kind
-// (goal-progress-editor.tsx / funnel-editor.tsx / metric-free-editor.tsx), nunca JSON cru: o
-// requisito era um "método clean" pra quem lança os números não precisar tocar em JSON. A key é
-// derivada do rótulo em features/add-widget-item/service.ts.
+// Edição de ESTRUTURA — texto livre, formulário dedicado, nunca JSON cru: o requisito era um
+// "método clean" pra quem lança os números não precisar tocar em JSON. Só etapa (funnel) e item
+// (metric_free) — "grupo" (curso/segmento) vem do catálogo compartilhado agora, ver
+// assignWidgetGroupAction/unassignWidgetGroupAction abaixo.
 export async function addWidgetItemAction(
   _prevState: ScoreboardActionState,
   formData: FormData,
@@ -101,7 +103,7 @@ export async function addWidgetItemAction(
 
   const boardId = String(formData.get("boardId") ?? "");
   const widgetId = String(formData.get("widgetId") ?? "");
-  const kind = String(formData.get("kind") ?? "") as "goal_progress" | "funnel" | "metric_free";
+  const kind = String(formData.get("kind") ?? "") as "funnel" | "metric_free";
   const label = String(formData.get("label") ?? "");
 
   const result = await addWidgetItem(
@@ -121,10 +123,49 @@ export async function removeWidgetItemAction(
 
   const boardId = String(formData.get("boardId") ?? "");
   const widgetId = String(formData.get("widgetId") ?? "");
-  const kind = String(formData.get("kind") ?? "") as "goal_progress" | "funnel" | "metric_free";
+  const kind = String(formData.get("kind") ?? "") as "funnel" | "metric_free";
   const key = String(formData.get("key") ?? "");
 
   const result = await removeWidgetItem({ widgetId, kind, key });
+  if (!result.success) return { error: result.error.message };
+  revalidatePath(boardPath(boardId));
+  return { error: null };
+}
+
+// Atribui/solta um curso/segmento JÁ CADASTRADO no catálogo (/admin/scoreboard/groups) a um
+// widget goal_progress/funnel — o curso em si é gerenciado em outro lugar (pedido explícito do
+// usuário), aqui só liga/desliga a referência dentro deste widget.
+export async function assignWidgetGroupAction(
+  _prevState: ScoreboardActionState,
+  formData: FormData,
+): Promise<ScoreboardActionState> {
+  if (!(await isPluginActive("scoreboard"))) return { error: PLUGIN_DISABLED_ERROR };
+
+  const boardId = String(formData.get("boardId") ?? "");
+  const result = await assignWidgetGroup({
+    widgetId: String(formData.get("widgetId") ?? ""),
+    kind: String(formData.get("kind") ?? "") as "goal_progress" | "funnel",
+    groupKey: String(formData.get("groupKey") ?? ""),
+  });
+
+  if (!result.success) return { error: result.error.message };
+  revalidatePath(boardPath(boardId));
+  return { error: null };
+}
+
+export async function unassignWidgetGroupAction(
+  _prevState: ScoreboardActionState,
+  formData: FormData,
+): Promise<ScoreboardActionState> {
+  if (!(await isPluginActive("scoreboard"))) return { error: PLUGIN_DISABLED_ERROR };
+
+  const boardId = String(formData.get("boardId") ?? "");
+  const result = await unassignWidgetGroup({
+    widgetId: String(formData.get("widgetId") ?? ""),
+    kind: String(formData.get("kind") ?? "") as "goal_progress" | "funnel",
+    groupKey: String(formData.get("groupKey") ?? ""),
+  });
+
   if (!result.success) return { error: result.error.message };
   revalidatePath(boardPath(boardId));
   return { error: null };

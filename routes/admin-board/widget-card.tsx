@@ -1,5 +1,5 @@
 import { Badge } from "@venore/plugin-sdk/ui";
-import type { WidgetRecord } from "../../contracts/types";
+import type { GroupRecord, WidgetRecord } from "../../contracts/types";
 import type { FunnelWidgetConfig, GoalProgressWidgetConfig, MetricFreeWidgetConfig } from "../../shared/widget-config/types";
 import { GoalProgressEditor } from "./goal-progress-editor";
 import { FunnelEditor } from "./funnel-editor";
@@ -14,7 +14,7 @@ const KIND_LABELS: Record<WidgetRecord["kind"], string> = {
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
-export function WidgetCard({ boardId, widget }: { boardId: string; widget: WidgetRecord }) {
+export function WidgetCard({ boardId, widget, catalog }: { boardId: string; widget: WidgetRecord; catalog: GroupRecord[] }) {
   const readOnly = widget.dataSource === "prime_sync";
 
   return (
@@ -36,10 +36,22 @@ export function WidgetCard({ boardId, widget }: { boardId: string; widget: Widge
 
       <div className="px-4 pb-4">
         {widget.kind === "goal_progress" && (
-          <GoalProgressEditor boardId={boardId} widgetId={widget.id} config={widget.config as GoalProgressWidgetConfig} readOnly={readOnly} />
+          <GoalProgressEditor
+            boardId={boardId}
+            widgetId={widget.id}
+            config={widget.config as GoalProgressWidgetConfig}
+            catalog={catalog}
+            readOnly={readOnly}
+          />
         )}
         {widget.kind === "funnel" && (
-          <FunnelEditor boardId={boardId} widgetId={widget.id} config={widget.config as FunnelWidgetConfig} readOnly={readOnly} />
+          <FunnelEditor
+            boardId={boardId}
+            widgetId={widget.id}
+            config={widget.config as FunnelWidgetConfig}
+            catalog={catalog}
+            readOnly={readOnly}
+          />
         )}
         {widget.kind === "metric_free" && (
           <MetricFreeEditor boardId={boardId} widgetId={widget.id} config={widget.config as MetricFreeWidgetConfig} readOnly={readOnly} />

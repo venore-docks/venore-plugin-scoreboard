@@ -15,16 +15,21 @@ export function computeAchievedPercent(actual: number, goal: number): number | n
   return Math.round((actual / goal) * 1000) / 10; // uma casa decimal
 }
 
+// `label` não vem mais de dentro do GoalProgressGroup cru (isso mudou de lugar pro catálogo
+// compartilhado, ver database/schema/index.ts, scoreboardGroups) — quem monta o summary precisa
+// resolver e passar o label de fora (ver features/get-board-view/service.ts).
 export type GoalProgressGroupSummary = GoalProgressGroup & {
+  label: string;
   reenrollmentGoal: number;
   newStudentsAchievedPercent: number | null;
   reenrollmentAchievedPercent: number | null;
 };
 
-export function summarizeGoalProgressGroup(group: GoalProgressGroup): GoalProgressGroupSummary {
+export function summarizeGoalProgressGroup(group: GoalProgressGroup, label: string): GoalProgressGroupSummary {
   const reenrollmentGoal = computeReenrollmentGoal(group);
   return {
     ...group,
+    label,
     reenrollmentGoal,
     newStudentsAchievedPercent: computeAchievedPercent(group.newStudentsActual, group.newStudentsGoal),
     reenrollmentAchievedPercent: computeAchievedPercent(group.reenrolledActual, reenrollmentGoal),

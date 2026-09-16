@@ -16,7 +16,7 @@ export function RemoveItemButton({
 }: {
   boardId: string;
   widgetId: string;
-  kind: "goal_progress" | "funnel" | "metric_free";
+  kind: "funnel" | "metric_free";
   itemKey: string;
   itemLabel: string;
 }) {

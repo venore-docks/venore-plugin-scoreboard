@@ -2,7 +2,7 @@ import { beginOperation, endOperation } from "@venore/plugin-sdk/observability";
 import { publishBoardEvent } from "../../runtime/board-bus";
 import { slugify } from "../../shared/slug";
 import { validateWidgetConfig } from "../../shared/widget-config/validate-widget-config";
-import type { FunnelWidgetConfig, GoalProgressWidgetConfig, MetricFreeWidgetConfig } from "../../shared/widget-config/types";
+import type { FunnelWidgetConfig, MetricFreeWidgetConfig } from "../../shared/widget-config/types";
 import { applyWidgetConfig, findWidgetById } from "./store";
 import type { AddWidgetItemCommand, AddWidgetItemResult } from "./types";
 
@@ -42,17 +42,7 @@ export async function addWidgetItem(command: AddWidgetItemCommand): Promise<AddW
   }
 
   let nextConfig: Record<string, unknown>;
-  if (command.kind === "goal_progress") {
-    const config = widget.config as GoalProgressWidgetConfig;
-    const key = generateUniqueKey(command.label, new Set(config.groups.map((group) => group.key)));
-    nextConfig = {
-      ...config,
-      groups: [
-        ...config.groups,
-        { key, label: command.label.trim(), newStudentsGoal: 0, newStudentsActual: 0, retentionTargetPercent: 93, eligibleBase: 0, reenrolledActual: 0 },
-      ],
-    };
-  } else if (command.kind === "funnel") {
+  if (command.kind === "funnel") {
     const config = widget.config as FunnelWidgetConfig;
     const key = generateUniqueKey(command.label, new Set(config.stages.map((stage) => stage.key)));
     const nextOrder = config.stages.length === 0 ? 0 : Math.max(...config.stages.map((stage) => stage.order)) + 1;

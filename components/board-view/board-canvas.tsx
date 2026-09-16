@@ -61,7 +61,15 @@ export function BoardCanvas({ boardId, initialView }: { boardId: string; initial
           case "goal_progress":
             return <GoalProgressPanel key={widget.id} title={widget.title} groups={widget.groups} />;
           case "funnel":
-            return <FunnelPanel key={widget.id} title={widget.title} stages={widget.stages} countsByGroup={widget.countsByGroup} />;
+            return (
+              <FunnelPanel
+                key={widget.id}
+                title={widget.title}
+                stages={widget.stages}
+                countsByGroup={widget.countsByGroup}
+                groupLabels={widget.groupLabels}
+              />
+            );
           case "metric_free":
             return <MetricFreePanel key={widget.id} title={widget.title} items={widget.items} />;
           default:

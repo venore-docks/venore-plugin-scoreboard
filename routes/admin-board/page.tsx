@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ListTree } from "lucide-react";
-import { getBoard } from "../../index";
+import { ArrowLeft, GraduationCap, ListTree } from "lucide-react";
+import { getBoard, listGroups } from "../../index";
 import { getPluginAdminPageData } from "@venore/plugin-sdk/admin";
 import { AdminAccessDenied, Button } from "@venore/plugin-sdk/ui";
 import { BoardSettingsForm } from "./board-settings-form";
@@ -23,6 +23,8 @@ export default async function ScoreboardAdminBoardPage({ params }: { params: Pro
 
   const board = result.data;
   const orderedWidgets = [...board.widgets].sort((a, b) => a.order - b.order);
+  const groupsResult = await listGroups();
+  const catalog = groupsResult.success ? groupsResult.data : [];
 
   return (
     <div className="space-y-8">
@@ -36,12 +38,20 @@ export default async function ScoreboardAdminBoardPage({ params }: { params: Pro
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">{board.name}</h1>
         </div>
-        <Button variant="outline" asChild>
-          <Link href={`/admin/scoreboard/${board.id}/prime-mapping`}>
-            <ListTree className="size-4" />
-            Mapeamento Prime
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/admin/scoreboard/groups">
+              <GraduationCap className="size-4" />
+              Cursos e segmentos
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={`/admin/scoreboard/${board.id}/prime-mapping`}>
+              <ListTree className="size-4" />
+              Mapeamento Prime
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <BoardSettingsForm
@@ -61,7 +71,7 @@ export default async function ScoreboardAdminBoardPage({ params }: { params: Pro
         ) : (
           <div className="space-y-4">
             {orderedWidgets.map((widget) => (
-              <WidgetCard key={widget.id} boardId={board.id} widget={widget} />
+              <WidgetCard key={widget.id} boardId={board.id} widget={widget} catalog={catalog} />
             ))}
           </div>
         )}

@@ -17,6 +17,15 @@ export {
 } from "./features/set-widget-manual-value/handler";
 export { addWidgetItemHandler as addWidgetItem } from "./features/add-widget-item/handler";
 export { removeWidgetItemHandler as removeWidgetItem } from "./features/remove-widget-item/handler";
+export { assignWidgetGroupHandler as assignWidgetGroup } from "./features/assign-widget-group/handler";
+export {
+  unassignWidgetGroupHandler as unassignWidgetGroup,
+} from "./features/unassign-widget-group/handler";
+
+export { createGroupHandler as createGroup } from "./features/create-group/handler";
+export { updateGroupHandler as updateGroup } from "./features/update-group/handler";
+export { deleteGroupHandler as deleteGroup } from "./features/delete-group/handler";
+export { listGroupsHandler as listGroups } from "./features/list-groups/handler";
 
 export {
   listPrimeStatusMappingHandler as listPrimeStatusMapping,
@@ -59,6 +68,7 @@ export type {
   PrimeSyncLogRecord,
   PrimeStatusMappingRecord,
   ScoreboardLiveEvent,
+  GroupRecord,
 } from "./contracts/types";
 
 export type { CreateBoardInput, CreateBoardResult } from "./features/create-board/types";
@@ -79,6 +89,16 @@ export type {
 } from "./features/set-widget-manual-value/types";
 export type { AddWidgetItemInput, AddWidgetItemResult } from "./features/add-widget-item/types";
 export type { RemoveWidgetItemInput, RemoveWidgetItemResult } from "./features/remove-widget-item/types";
+export type { AssignWidgetGroupInput, AssignWidgetGroupResult } from "./features/assign-widget-group/types";
+export type {
+  UnassignWidgetGroupInput,
+  UnassignWidgetGroupResult,
+} from "./features/unassign-widget-group/types";
+
+export type { CreateGroupInput, CreateGroupResult } from "./features/create-group/types";
+export type { UpdateGroupInput, UpdateGroupResult } from "./features/update-group/types";
+export type { DeleteGroupInput, DeleteGroupResult } from "./features/delete-group/types";
+export type { ListGroupsResult } from "./features/list-groups/types";
 
 export type {
   ListPrimeStatusMappingInput,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gauge, RefreshCw } from "lucide-react";
+import { Gauge, GraduationCap, RefreshCw } from "lucide-react";
 import { listBoards } from "../../index";
 import { getPluginAdminPageData } from "@venore/plugin-sdk/admin";
 import { AdminAccessDenied, AdminPageHeader, Badge, Button, EmptyState } from "@venore/plugin-sdk/ui";
@@ -26,6 +26,12 @@ export default async function ScoreboardAdminPage() {
         description="Quadros de metas, funil de matrícula e métricas por setor — consumíveis na web e como tela de TV pelo Broadcast Studio."
         actions={
           <>
+            <Button variant="outline" asChild>
+              <Link href="/admin/scoreboard/groups">
+                <GraduationCap className="size-4" />
+                Cursos e segmentos
+              </Link>
+            </Button>
             <Button variant="outline" asChild>
               <Link href="/admin/scoreboard/prime-sync">
                 <RefreshCw className="size-4" />

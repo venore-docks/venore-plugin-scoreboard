@@ -5,7 +5,6 @@ import type { GoalProgressGroup } from "./types";
 function group(overrides: Partial<GoalProgressGroup> = {}): GoalProgressGroup {
   return {
     key: "infantil",
-    label: "Educação Infantil",
     newStudentsGoal: 60,
     newStudentsActual: 30,
     retentionTargetPercent: 93,
@@ -38,8 +37,9 @@ describe("computeAchievedPercent", () => {
 
 describe("summarizeGoalProgressGroup", () => {
   it("combina o grupo cru com a meta de rematrícula e os percentuais calculados", () => {
-    const summary = summarizeGoalProgressGroup(group());
+    const summary = summarizeGoalProgressGroup(group(), "Educação Infantil");
 
+    expect(summary.label).toBe("Educação Infantil");
     expect(summary.reenrollmentGoal).toBe(186);
     expect(summary.newStudentsAchievedPercent).toBe(50);
     expect(summary.reenrollmentAchievedPercent).toBeCloseTo(91.4, 1);

@@ -7,6 +7,7 @@ import {
   applyWidgetSyncUpdate,
   findAllStudentsRaw,
   findBoardsWithPrimeSyncWidgets,
+  findGroupsByKeys,
   findMappingsForBoard,
   finishLog,
   insertRunningLog,
@@ -15,7 +16,25 @@ import {
 } from "./store";
 import type { TriggerPrimeSyncCommand, TriggerPrimeSyncResult } from "./types";
 
-function resolveGroupsAndTerminalStage(target: PrimeSyncBoardTarget): {
+// Toda key de grupo referenciada por este board — tanto pelo widget goal_progress quanto pelo
+// funnel (os dois passaram a compartilhar o mesmo catálogo, ver database/schema/index.ts,
+// scoreboardGroups). É o conjunto que precisa de primeSegmentKey resolvido pra sincronizar.
+function collectTargetGroupKeys(target: PrimeSyncBoardTarget): Set<string> {
+  const keys = new Set<string>();
+  for (const widget of target.widgets) {
+    if (widget.kind === "goal_progress") {
+      for (const group of (widget.config as GoalProgressWidgetConfig).groups ?? []) keys.add(group.key);
+    } else if (widget.kind === "funnel") {
+      for (const key of Object.keys((widget.config as FunnelWidgetConfig).countsByGroup ?? {})) keys.add(key);
+    }
+  }
+  return keys;
+}
+
+function resolveGroupsAndTerminalStage(
+  target: PrimeSyncBoardTarget,
+  primeSegmentKeyByGroupKey: Map<string, string | null>,
+): {
   groups: PrimeGroupResolution[];
   terminalStageKey: string | null;
   funnelWidgetId: string | null;
@@ -24,16 +43,13 @@ function resolveGroupsAndTerminalStage(target: PrimeSyncBoardTarget): {
   const funnelWidget = target.widgets.find((widget) => widget.kind === "funnel") ?? null;
   const goalWidget = target.widgets.find((widget) => widget.kind === "goal_progress") ?? null;
 
-  // Resolução grupo -> segmento da Prime vem só do widget goal_progress (é o único lugar onde
-  // primeSegmentKey é declarado, ver shared/widget-config/types.ts). Um board só com funnel (sem
-  // goal_progress) e prime_sync fica sem resolução de grupo — LIMITAÇÃO conhecida do v1, sem
-  // payload real da Prime pra confirmar outro jeito de resolver isso.
-  const groups: PrimeGroupResolution[] = goalWidget
-    ? ((goalWidget.config as GoalProgressWidgetConfig).groups ?? []).map((group) => ({
-        groupKey: group.key,
-        primeSegmentKey: group.primeSegmentKey ?? group.key,
-      }))
-    : [];
+  // primeSegmentKey agora vem do catálogo compartilhado (era um campo solto em cada
+  // GoalProgressGroup antes desta mudança) — fallback pra própria key se o catálogo não tiver
+  // (grupo sem primeSegmentKey configurado ainda).
+  const groups: PrimeGroupResolution[] = [...collectTargetGroupKeys(target)].map((groupKey) => ({
+    groupKey,
+    primeSegmentKey: primeSegmentKeyByGroupKey.get(groupKey) ?? groupKey,
+  }));
 
   const stages = funnelWidget ? (funnelWidget.config as FunnelWidgetConfig).stages ?? [] : [];
   const terminalStageKey = stages.length > 0 ? [...stages].sort((a, b) => b.order - a.order)[0].key : null;
@@ -58,10 +74,16 @@ export async function triggerPrimeSync(command: TriggerPrimeSyncCommand): Promis
 
     const allStudents = await findAllStudentsRaw();
     const targets = await findBoardsWithPrimeSyncWidgets();
+
+    const allGroupKeys = new Set<string>();
+    for (const target of targets) for (const key of collectTargetGroupKeys(target)) allGroupKeys.add(key);
+    const catalogGroups = await findGroupsByKeys([...allGroupKeys]);
+    const primeSegmentKeyByGroupKey = new Map(catalogGroups.map((group) => [group.key, group.primeSegmentKey]));
+
     const boardsRecomputed: string[] = [];
 
     for (const target of targets) {
-      const { groups, terminalStageKey, funnelWidgetId, goalWidgetId } = resolveGroupsAndTerminalStage(target);
+      const { groups, terminalStageKey, funnelWidgetId, goalWidgetId } = resolveGroupsAndTerminalStage(target, primeSegmentKeyByGroupKey);
       const statusMapping = await findMappingsForBoard(target.boardId);
       const applied = applyStatusMapping({ students: allStudents, statusMapping, groups, terminalStageKey });
 

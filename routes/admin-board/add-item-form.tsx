@@ -7,22 +7,21 @@ import { addWidgetItemAction, type ScoreboardActionState } from "./actions";
 
 const initialState: ScoreboardActionState = { error: null };
 
-const FIELD_LABEL: Record<"goal_progress" | "funnel" | "metric_free", string> = {
-  goal_progress: "Novo grupo",
+const FIELD_LABEL: Record<"funnel" | "metric_free", string> = {
   funnel: "Nova etapa",
   metric_free: "Novo item",
 };
 
-const LABEL_PLACEHOLDER: Record<"goal_progress" | "funnel" | "metric_free", string> = {
-  goal_progress: "Ensino Médio",
+const LABEL_PLACEHOLDER: Record<"funnel" | "metric_free", string> = {
   funnel: "Documentação",
   metric_free: "Doações do mês",
 };
 
 // "Método clean pra inserir os dados" — pede só o rótulo (a key vira um slug dele
 // automaticamente, ver features/add-widget-item/service.ts), sem exigir que quem está cadastrando
-// pense em slug ou edite JSON.
-export function AddItemForm({ boardId, widgetId, kind }: { boardId: string; widgetId: string; kind: "goal_progress" | "funnel" | "metric_free" }) {
+// pense em slug ou edite JSON. Só etapa (funnel) e item (metric_free) — grupo (curso/segmento)
+// agora vem do catálogo compartilhado, ver assign-group-form.tsx.
+export function AddItemForm({ boardId, widgetId, kind }: { boardId: string; widgetId: string; kind: "funnel" | "metric_free" }) {
   const [state, formAction, pending] = useActionState(addWidgetItemAction, initialState);
   useActionToast({ pending, error: state.error, successMessage: "Adicionado." });
 

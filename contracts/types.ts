@@ -31,6 +31,19 @@ export type WidgetRecord = {
 
 export type BoardWithWidgets = BoardRecord & { widgets: WidgetRecord[] };
 
+// Catálogo compartilhado de cursos/segmentos (database/schema/index.ts, scoreboardGroups) — `key`
+// é o valor que goal_progress.groups[].key e funnel.countsByGroup, dentro do config jsonb de
+// qualquer widget de qualquer board, referenciam.
+export type GroupRecord = {
+  id: string;
+  key: string;
+  label: string;
+  primeSegmentKey: string | null;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type PrimeSyncStatus = "running" | "success" | "failed";
 
 export type PrimeSyncLogRecord = {

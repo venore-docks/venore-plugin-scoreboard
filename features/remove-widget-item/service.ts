@@ -1,6 +1,6 @@
 import { beginOperation, endOperation } from "@venore/plugin-sdk/observability";
 import { publishBoardEvent } from "../../runtime/board-bus";
-import type { FunnelWidgetConfig, GoalProgressWidgetConfig, MetricFreeWidgetConfig } from "../../shared/widget-config/types";
+import type { FunnelWidgetConfig, MetricFreeWidgetConfig } from "../../shared/widget-config/types";
 import { applyWidgetConfig, findWidgetById } from "./store";
 import type { RemoveWidgetItemCommand, RemoveWidgetItemResult } from "./types";
 
@@ -26,10 +26,7 @@ export async function removeWidgetItem(command: RemoveWidgetItemCommand): Promis
   }
 
   let nextConfig: Record<string, unknown>;
-  if (command.kind === "goal_progress") {
-    const config = widget.config as GoalProgressWidgetConfig;
-    nextConfig = { ...config, groups: config.groups.filter((group) => group.key !== command.key) };
-  } else if (command.kind === "funnel") {
+  if (command.kind === "funnel") {
     const config = widget.config as FunnelWidgetConfig;
     // Remove a contagem da etapa em TODOS os grupos também — deixar countsByGroup referenciando
     // uma etapa que não existe mais quebraria validateWidgetConfig na próxima edição qualquer.

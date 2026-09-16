@@ -22,6 +22,10 @@ export type BoardViewWidget =
       lastSyncedAt: Date | null;
       stages: FunnelStage[];
       countsByGroup: Record<string, Record<string, number>>;
+      // Label do catálogo compartilhado (database/schema/index.ts, scoreboardGroups) por groupKey
+      // usado em countsByGroup — resolvido em service.ts. Ausência (grupo apagado por fora, não
+      // deveria acontecer dado o bloqueio de delete) cai no fallback da própria key no consumidor.
+      groupLabels: Record<string, string>;
     }
   | {
       id: string;

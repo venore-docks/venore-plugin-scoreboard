@@ -74,6 +74,30 @@ export const scoreboardWidgets = scoreboardSchema.table(
   ],
 );
 
+// Catálogo compartilhado de cursos/segmentos — vive fora de qualquer widget/board de propósito
+// (pedido explícito do usuário: "lista única, compartilhada entre quadros"). goal_progress.groups[].key
+// e funnel.countsByGroup (dentro do config jsonb dos widgets) passam a referenciar `key` daqui —
+// sem FK física possível (o valor vive dentro de um jsonb), a integridade é garantida na camada de
+// aplicação: assign-widget-group confirma que a key existe antes de gravar, delete-group recusa
+// apagar uma key ainda referenciada por algum widget.
+//
+// primeSegmentKey mora aqui (não em GoalProgressGroup) porque é propriedade da identidade do
+// curso — "como a Prime chama isso" não deveria divergir entre dois widgets/boards que
+// representam o mesmo curso.
+export const scoreboardGroups = scoreboardSchema.table(
+  "groups",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    key: text("key").notNull(),
+    label: text("label").notNull(),
+    primeSegmentKey: text("prime_segment_key"),
+    order: integer("order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("scoreboard_groups_key_idx").on(table.key)],
+);
+
 // Auditoria de cada disparo de sync (manual em v1; job agendado é fase futura). status "running"
 // é gravado no início da chamada; endOperation/service atualiza no fim — permite a UI do admin
 // mostrar "sincronizando..." sem sondar o processo. boardsRecomputed é a lista de boardId (jsonb)

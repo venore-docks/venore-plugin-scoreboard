@@ -1,6 +1,7 @@
 import { asPluginApiHandler, asPluginPage, type PluginRouteTable } from "@venore/plugin-sdk";
 import AdminBoardsListPage from "./admin/page";
 import AdminBoardPage from "./admin-board/page";
+import AdminGroupsPage from "./admin-groups/page";
 import AdminPrimeMappingPage from "./admin-prime-mapping/page";
 import AdminPrimeSyncPage from "./admin-prime-sync/page";
 import ScoreboardWebPage from "./scoreboard-web/page";
@@ -13,6 +14,7 @@ export const scoreboardRouteTable: PluginRouteTable = {
   admin: [
     { pattern: "", Component: asPluginPage(AdminBoardsListPage) },
     { pattern: "prime-sync", Component: asPluginPage(AdminPrimeSyncPage) },
+    { pattern: "groups", Component: asPluginPage(AdminGroupsPage) },
     { pattern: ":boardId", Component: asPluginPage(AdminBoardPage) },
     { pattern: ":boardId/prime-mapping", Component: asPluginPage(AdminPrimeMappingPage) },
   ],
