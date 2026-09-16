@@ -8,6 +8,13 @@
       "when": 1789504418278,
       "tag": "0000_faithful_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789589114670,
+      "tag": "0001_natural_solo",
+      "breakpoints": true
     }
   ]
 }
